@@ -1,177 +1,25 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>PVB Stock Center</title>
-  <style>
-    body {
-      font-family: Poppins, Arial, sans-serif;
-      background: #0a121f;
-      color: #e6eef6;
-      margin: 0; padding: 0;
-    }
-    section {
-      display: none;
-      padding: 30px;
-      text-align: center;
-    }
-    h1,h2 { margin-bottom: 20px; }
-    button {
-      background: #22d3ee;
-      border: none;
-      color: #000;
-      padding: 12px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      margin: 10px;
-      transition: all .2s;
-    }
-    button:hover { background: #38bdf8; transform: scale(1.05); }
-
-    table {
-      width: 100%;
-      max-width: 700px;
-      margin: 20px auto;
-      border-collapse: collapse;
-    }
-    th, td {
-      padding: 10px 14px;
-      text-align: left;
-      border-bottom: 1px solid #2a2f3e;
-    }
-    th { background: #112030; }
-    tr:nth-child(even) { background: #0f162b; }
-    .low { color: #ef4444; }
-    .ok { color: #10b981; }
-    #notify {
-      text-align: center;
-      margin-top: 10px;
-      font-weight: bold;
-      color: #22d3ee;
-      display: none;
-      animation: fade 1.2s ease-in-out infinite alternate;
-    }
-    @keyframes fade {
-      from { opacity: 0.5; } to { opacity: 1; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PVB Stock Checker</title>
+<style>
+  body { font-family: Poppins, sans-serif; background: #121212; color: #fff; text-align: center; margin: 0; padding: 0; }
+  h1, h2 { color: #00ff9f; }
+  .page { display: none; padding: 20px; }
+  button { background: #00ff9f; color: #000; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; margin: 10px; font-weight: bold; }
+  button:hover { background: #00cc7a; }
+  .stock { background: #1e1e1e; border-radius: 10px; padding: 10px; margin: 10px auto; width: 80%; text-align: left; }
+  .footer { margin-top: 20px; font-size: 12px; color: #777; }
+</style>
 </head>
 <body>
 
-  <!-- HALAMAN 1: Pilih Mode -->
-  <section id="page1" style="display:block">
-    <h1>🧠 Plants vs Brainrots Stock Center</h1>
-    <p>Pilih shop yang ingin kamu lihat stoknya:</p>
-    <button onclick="openShop('seed')">🌱 Seed Shop</button>
-    <button onclick="openShop('gear')">🔧 Gear Shop</button>
-  </section>
-
-  <!-- HALAMAN 2: Shop -->
-  <section id="page2">
-    <h1 id="shopTitle"></h1>
-    <div id="notify">🔄 Shop telah restock!</div>
-    <table>
-      <thead>
-        <tr><th>Item</th><th>Harga ($)</th><th>Stok</th><th>Status</th></tr>
-      </thead>
-      <tbody id="stockBody"></tbody>
-    </table>
-    <button onclick="goPage('page1')">⬅ Kembali</button>
-    <button onclick="goPage('page3')">🔗 Cek Stock di Roblox</button>
-  </section>
-
-  <!-- HALAMAN 3: Cek Stock di Roblox -->
-  <section id="page3">
-    <h1>🔗 Menuju Roblox Shop</h1>
-    <p>Klik tombol di bawah untuk membuka shop resmi game Plants vs Brainrots di Roblox.</p>
-    <button onclick="window.open('https://www.roblox.com/games/17443466482/Plants-vs-Brainrots','_blank')">
-      🚀 Buka di Roblox
-    </button>
-    <br><br>
-    <button onclick="goPage('page1')">⬅ Kembali ke Awal</button>
-  </section>
-
-  <script>
-    // Data dasar
-    const seedItems = [
-      { name:"Cactus", price:200 },
-      { name:"Strawberry", price:1250 },
-      { name:"Pumpkin", price:5000 },
-      { name:"Sunflower", price:25000 },
-      { name:"Dragon Fruit", price:100000 },
-    ];
-    const gearItems = [
-      { name:"Water Bucket", price:7500 },
-      { name:"Frost Grenade", price:12500 },
-      { name:"Banana Gun", price:25000 },
-      { name:"Frost Blower", price:125000 },
-      { name:"Carrot Launcher", price:500000 },
-    ];
-
-    let currentShop = "seed";
-    let currentStock = [];
-
-    // --- Navigasi antar halaman ---
-    function goPage(id){
-      document.querySelectorAll("section").forEach(s=>s.style.display="none");
-      document.getElementById(id).style.display="block";
-    }
-
-    function openShop(type){
-      currentShop = type;
-      goPage("page2");
-      loadShop();
-    }
-
-    // --- Generate dan render stok ---
-    function generateStock(items){
-      const list = [];
-      const count = 3 + Math.floor(Math.random()*3); // 3–5 item
-      const shuffled = items.sort(()=>0.5 - Math.random());
-      for(let i=0;i<count;i++){
-        const base = shuffled[i].price;
-        const price = base + Math.floor((Math.random()*0.2 - 0.1)*base);
-        const qty = Math.floor(Math.random()*10 + 1);
-        list.push({ name: shuffled[i].name, price, qty });
-      }
-      return list;
-    }
-
-    function renderTable(){
-      const tbody = document.getElementById("stockBody");
-      tbody.innerHTML = "";
-      currentStock.forEach(item=>{
-        const status = item.qty <= 2 ? "Hampir habis" : "Cukup stok";
-        const cls = item.qty <= 2 ? "low" : "ok";
-        const tr = document.createElement("tr");
-        tr.innerHTML = <td>${item.name}</td><td>$${item.price.toLocaleString()}</td><td>${item.qty}</td><td class="${cls}">${status}</td>;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function restock(){
-      const notif = document.getElementById("notify");
-      notif.style.display = "block";
-      setTimeout(()=>notif.style.display="none", 4000);
-      loadShop();
-    }
-
-    function loadShop(){
-      const title = document.getElementById("shopTitle");
-      if(currentShop === "seed"){
-        title.textContent = "🌱 Seed Shop (Restock tiap 5 menit)";
-        currentStock = generateStock(seedItems);
-      } else {
-        title.textContent = "🔧 Gear Shop (Restock tiap 5 menit)";
-        currentStock = generateStock(gearItems);
-      }
-      renderTable();
-    }
-
-    // Restock tiap 5 menit = 300000 ms
-    setInterval(restock, 300000);
-  </script>
-</body>
-</html>
+<!-- Halaman 1 -->
+<div id="page1" class="page" style="display:block;">
+  <h1>Grow a Garden & Plants vs Brainrots Stock</h1>
+  <p>Pilih mode untuk melihat stok item game Roblox:</p>
+  <button onclick="goToPage('page2','gear')">Gear Shop</button>
+  <button onclick="goToPage('page2','seed')">Seed Shop</button>
+</div>
