@@ -1,0 +1,72 @@
+<div id="page2" class="page">
+  <h2 id="shopTitle">Loading...</h2>
+  <div id="stockContainer"></div>
+  <button onclick="goToPage('page3')">Cek Stock di Roblox</button><br>
+  <button onclick="goToPage('page1')">Kembali</button>
+  <div class="footer" id="lastUpdate"></div>
+</div>
+
+<!-- Halaman 3 -->
+<div id="page3" class="page">
+  <h2>Cek Stock Langsung di Roblox</h2>
+  <p>Klik tombol di bawah untuk membuka halaman Roblox resmi.</p>
+  <button onclick="window.open('https://www.roblox.com/games/15532962286/Plants-vs-Brainrots','_blank')">Buka di Roblox</button>
+  <br><br>
+  <button onclick="goToPage('page1')">Kembali ke Menu Awal</button>
+</div>
+
+<script>
+let currentShop = "";
+const gearItems = [
+  { name: "Rusty Hoe", price: 1500 },
+  { name: "Golden Watering Can", price: 3000 },
+  { name: "Magic Shovel", price: 2500 },
+  { name: "Leaf Blower", price: 2200 },
+  { name: "Sunlight Detector", price: 5000 }
+];
+const seedItems = [
+  { name: "Cactus Seed", price: 800 },
+  { name: "Pumpkin Seed", price: 1000 },
+  { name: "Sunflower Seed", price: 700 },
+  { name: "Venus Trap Seed", price: 2000 },
+  { name: "Ice Plant Seed", price: 1800 }
+];
+
+function goToPage(page, shopType) {
+  document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+  document.getElementById(page).style.display = 'block';
+  if (page === 'page2') {
+    currentShop = shopType;
+    loadStock();
+  }
+}
+
+function loadStock() {
+  const stockContainer = document.getElementById('stockContainer');
+  const title = document.getElementById('shopTitle');
+  stockContainer.innerHTML = "";
+  
+  const data = currentShop === "gear" ? gearItems : seedItems;
+  title.textContent = currentShop === "gear" ? "🧰 Gear Shop" : "🌱 Seed Shop";
+
+  // acak stok
+  const randomStock = data.sort(() => 0.5 - Math.random()).slice(0, 3);
+  
+  randomStock.forEach(item => {
+    const stock = Math.floor(Math.random() * 50) + 1;
+    const div = document.createElement('div');
+    div.className = "stock";
+    div.innerHTML = <strong>${item.name}</strong><br>💰 Harga: ${item.price} Coins<br>📦 Stok: ${stock};
+    stockContainer.appendChild(div);
+  });
+
+  const now = new Date();
+  document.getElementById('lastUpdate').textContent = "Terakhir diperbarui: " + now.toLocaleTimeString();
+
+  // restock setiap 5 menit
+  setTimeout(loadStock, 5 * 60 * 1000);
+}
+</script>
+
+</body>
+</html>
